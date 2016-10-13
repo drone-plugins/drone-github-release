@@ -1,8 +1,8 @@
-# drone-github-release
+# drone-svn-release
 
-[![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-github-release/status.svg)](http://beta.drone.io/drone-plugins/drone-github-release)
-[![Go Doc](https://godoc.org/github.com/drone-plugins/drone-github-release?status.svg)](http://godoc.org/github.com/drone-plugins/drone-github-release)
-[![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-github-release)](https://goreportcard.com/report/github.com/drone-plugins/drone-github-release)
+[![Build Status](http://beta.drone.io/api/badges/crandles/drone-svn-release/status.svg)](http://beta.drone.io/crandles/drone-svn-release)
+[![Go Doc](https://godoc.org/github.com/crandles/drone-svn-release?status.svg)](http://godoc.org/github.com/crandles/drone-svn-release)
+[![Go Report](https://goreportcard.com/badge/github.com/crandles/drone-svn-release)](https://goreportcard.com/report/github.com/crandles/drone-svn-release)
 [![Join the chat at https://gitter.im/drone/drone](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/drone/drone)
 
 Drone plugin to publish files and artifacts to GitHub Release. For the usage
@@ -32,7 +32,7 @@ GCO disabled will result in an error when running the Docker image:
 
 ```
 docker: Error response from daemon: Container command
-'/bin/drone-github-release' not found or does not exist..
+'/bin/drone-svn-release' not found or does not exist..
 ```
 
 ## Usage

@@ -5,5 +5,5 @@ RUN apk update && \
     ca-certificates && \
   rm -rf /var/cache/apk/*
 
-ADD drone-github-release /bin/
-ENTRYPOINT ["/bin/drone-github-release"]
+ADD drone-svn-release /bin/
+ENTRYPOINT ["/bin/drone-svn-release"]
