@@ -13,7 +13,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 )
 
 var (
@@ -25,8 +24,6 @@ var (
 )
 
 func execute(cmd *exec.Cmd) error {
-	fmt.Println("+", strings.Join(cmd.Args, " "))
-
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
