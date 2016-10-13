@@ -13,17 +13,17 @@ pipeline:
 
   latest:
     image: docker
-    repo: plugins/github-release
+    repo: crandles/svn-release
     tags: [ "latest", "1.0", "1" ]
     when:
       branch: master
       event: push
 
 plugin:
-  name: GitHub Release
-  desc: Publish files and artifacts to GitHub Releases
+  name: SVN Release
+  desc: Publish files and artifacts to SVN
   type: publish
-  image: plugins/github-release
+  image: crandles/svn-release
   labels:
     - github
     - release

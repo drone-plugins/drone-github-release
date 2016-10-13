@@ -13,50 +13,31 @@ var build = "0" // build number set at compile-time
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "github-release plugin"
-	app.Usage = "github-release plugin"
+	app.Name = "svn-release plugin"
+	app.Usage = "svn-release plugin"
 	app.Action = run
 	app.Version = fmt.Sprintf("1.0.%s", build)
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "api-key",
-			Usage:  "api key to access github api",
-			EnvVar: "PLUGIN_API_KEY,GITHUB_RELEASE_API_KEY,GITHUB_TOKEN",
+			Name:   "user",
+			Usage:  "username to access svn url",
+			EnvVar: "PLUGIN_USER,SVN_RELEASE_USER",
 		},
 		cli.StringSliceFlag{
 			Name:   "files",
 			Usage:  "list of files to upload",
-			EnvVar: "PLUGIN_FILES,GITHUB_RELEASE_FILES",
+			EnvVar: "PLUGIN_FILES,SVN_RELEASE_FILES",
 		},
 		cli.StringFlag{
-			Name:   "file-exists",
-			Value:  "overwrite",
-			Usage:  "what to do if file already exist",
-			EnvVar: "PLUGIN_FILE_EXISTS,GITHUB_RELEASE_FILE_EXISTS",
-		},
-		cli.StringSliceFlag{
-			Name:   "checksum",
-			Usage:  "generate specific checksums",
-			EnvVar: "PLUGIN_CHECKSUM,GITHUB_RELEASE_CHECKSUM",
-		},
-		cli.BoolFlag{
-			Name:   "draft",
-			Usage:  "create a draft release",
-			EnvVar: "PLUGIN_DRAFT,GITHUB_RELEASE_DRAFT",
+			Name:   "password",
+			Usage:  "password to access svn url",
+			EnvVar: "PLUGIN_PASSWORD,SVN_RELEASE_PASSWORD",
 		},
 		cli.StringFlag{
 			Name:   "base-url",
-			Value:  "https://api.github.com/",
-			Usage:  "api url, needs to be changed for ghe",
-			EnvVar: "PLUGIN_BASE_URL,GITHUB_RELEASE_BASE_URL",
+			Usage:  "svn base URL to publish files to",
+			EnvVar: "PLUGIN_BASE_URL,SVN_RELEASE_BASE_URL",
 		},
-		cli.StringFlag{
-			Name:   "upload-url",
-			Value:  "https://uploads.github.com/",
-			Usage:  "upload url, needs to be changed for ghe",
-			EnvVar: "PLUGIN_UPLOAD_URL,GITHUB_RELEASE_UPLOAD_URL",
-		},
-
 		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
@@ -107,13 +88,10 @@ func run(c *cli.Context) error {
 			Ref: c.String("commit.ref"),
 		},
 		Config: Config{
-			APIKey:     c.String("api-key"),
-			Files:      c.StringSlice("files"),
-			FileExists: c.String("file-exists"),
-			Checksum:   c.StringSlice("checksum"),
-			Draft:      c.Bool("draft"),
-			BaseURL:    c.String("base-url"),
-			UploadURL:  c.String("upload-url"),
+			User:     c.String("user"),
+			BaseURL:  c.String("base-url"),
+			Password: c.String("password"),
+			Files:    c.StringSlice("files"),
 		},
 	}
 
