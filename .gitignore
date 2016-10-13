@@ -25,4 +25,4 @@ _testmain.go
 .env
 
 coverage.out
-drone-github-release
+drone-svn-release

@@ -1,9 +1,8 @@
-FROM alpine:3.4
+FROM cdrx/fpm-centos:7
 
-RUN apk update && \
-  apk add \
-    ca-certificates && \
-  rm -rf /var/cache/apk/*
+RUN yum install -y svn git
 
-ADD drone-github-release /bin/
-ENTRYPOINT ["/bin/drone-github-release"]
+ADD drone-svn-release /bin/
+ADD *.sh /bin/
+
+ENTRYPOINT ["/bin/drone-svn-release"]

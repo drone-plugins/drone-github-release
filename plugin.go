@@ -2,12 +2,8 @@ package main
 
 import (
 	"fmt"
-	"net/url"
+	"os/exec"
 	"path/filepath"
-	"strings"
-
-	"github.com/google/go-github/github"
-	"golang.org/x/oauth2"
 )
 
 type (
@@ -25,13 +21,10 @@ type (
 	}
 
 	Config struct {
-		APIKey     string
-		Files      []string
-		FileExists string
-		Checksum   []string
-		Draft      bool
-		BaseURL    string
-		UploadURL  string
+		User     string
+		Files    []string
+		Password string
+		BaseURL  string
 	}
 
 	Plugin struct {
@@ -48,23 +41,17 @@ func (p Plugin) Exec() error {
 	)
 
 	if p.Build.Event != "tag" {
-		return fmt.Errorf("The GitHub Release plugin is only available for tags")
+		return fmt.Errorf("The SVN Release plugin is only available for tags")
 	}
 
-	if p.Config.APIKey == "" {
-		return fmt.Errorf("You must provide an API key")
+	if p.Config.User == "" {
+		return fmt.Errorf("You must provide a User")
 	}
-
-	if !fileExistsValues[p.Config.FileExists] {
-		return fmt.Errorf("Invalid value for file_exists")
+	if p.Config.Password == "" {
+		return fmt.Errorf("You must provide a Password")
 	}
-
-	if !strings.HasSuffix(p.Config.BaseURL, "/") {
-		p.Config.BaseURL = p.Config.BaseURL + "/"
-	}
-
-	if !strings.HasSuffix(p.Config.UploadURL, "/") {
-		p.Config.UploadURL = p.Config.UploadURL + "/"
+	if p.Config.BaseURL == "" {
+		return fmt.Errorf("You must provide a SVN Directory URL")
 	}
 
 	for _, glob := range p.Config.Files {
@@ -79,56 +66,68 @@ func (p Plugin) Exec() error {
 		}
 	}
 
-	if len(p.Config.Checksum) > 0 {
-		var (
-			err error
-		)
+	// if len(p.Config.Checksum) > 0 {
+	// 	var (
+	// 		err error
+	// 	)
+	//
+	// 	files, err = writeChecksums(files, p.Config.Checksum)
+	//
+	// 	if err != nil {
+	// 		return fmt.Errorf("Failed to write checksums. %s", err)
+	// 	}
+	// }
 
-		files, err = writeChecksums(files, p.Config.Checksum)
+	// baseURL, err := url.Parse(p.Config.BaseURL)
+	//
+	// if err != nil {
+	// 	return fmt.Errorf("Failed to parse base URL. %s", err)
+	// }
 
-		if err != nil {
-			return fmt.Errorf("Failed to write checksums. %s", err)
-		}
-	}
+	// rc := releaseClient{
+	// 	User:     p.Config.User,
+	// 	Password: p.Config.Password,
+	// 	BaseURL:  p.Config.BaseURL,
+	//
+	// 	Owner: p.Repo.Owner,
+	// 	Repo:  p.Repo.Name,
+	// 	Tag:   filepath.Base(p.Commit.Ref),
+	// 	Draft: p.Config.Draft,
+	// }
+	//
+	// release, err := rc.buildRelease()
+	// if err != nil {
+	// 	return fmt.Errorf("Failed to create the release. %s", err)
+	// }
 
-	baseURL, err := url.Parse(p.Config.BaseURL)
-
-	if err != nil {
-		return fmt.Errorf("Failed to parse base URL. %s", err)
-	}
-
-	uploadURL, err := url.Parse(p.Config.UploadURL)
-
-	if err != nil {
-		return fmt.Errorf("Failed to parse upload URL. %s", err)
-	}
-
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.Config.APIKey})
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
-
-	client := github.NewClient(tc)
-
-	client.BaseURL = baseURL
-	client.UploadURL = uploadURL
-
-	rc := releaseClient{
-		Client:     client,
-		Owner:      p.Repo.Owner,
-		Repo:       p.Repo.Name,
-		Tag:        filepath.Base(p.Commit.Ref),
-		Draft:      p.Config.Draft,
-		FileExists: p.Config.FileExists,
-	}
-
-	release, err := rc.buildRelease()
-
-	if err != nil {
-		return fmt.Errorf("Failed to create the release. %s", err)
-	}
-
-	if err := rc.uploadFiles(*release.ID, files); err != nil {
+	// if err := rc.uploadFiles(*release.ID, files); err != nil {
+	if err := release(p.Config.User, p.Config.Password, p.Config.BaseURL, p.Config.Files); err != nil {
 		return fmt.Errorf("Failed to upload the files. %s", err)
 	}
 
+	return nil
+}
+
+func release(user string, password string, url string, files []string) error {
+	// bash -c 'svn co --username $$ATLAS_USER --password "$$ATLAS_PASSWORD" --depth empty --trust-server-cert --non-interactive "https://atlas.sys.comcast.net/iss/iss/x86_64/7/global" atlas'
+	// @mv *.rpm atlas
+	// bash -c 'cd atlas && svn add *.rpm && svn ci --trust-server-cert --non-interactive --username $$ATLAS_USER --password "$$ATLAS_PASSWORD" -m "drone-ho-b01.dna.comcast.net: sampleproject: $$BUILD_NUMBER" *.rpm'
+
+	makeDir := exec.Command("make_svn_dir.sh", user, password, url, "svn-base-dir")
+	if err := execute(makeDir); err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		stage := exec.Command("cp", file, "svn-base-dir/")
+		if err := execute(stage); err != nil {
+			return fmt.Errorf("Failed to stage %s artifact: %s", file, err)
+		}
+	}
+
+	push := exec.Command("push.sh", user, password, "svn-base-dir/")
+	if err := execute(push); err != nil {
+		return fmt.Errorf("Failed to stage artifacts: %s", err)
+	}
 	return nil
 }
