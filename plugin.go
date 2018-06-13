@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"path/filepath"
@@ -104,8 +105,9 @@ func (p Plugin) Exec() error {
 		return fmt.Errorf("Failed to parse upload URL. %s", err)
 	}
 
+	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: p.Config.APIKey})
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
 
@@ -114,6 +116,7 @@ func (p Plugin) Exec() error {
 
 	rc := releaseClient{
 		Client:     client,
+		Context:    ctx,
 		Owner:      p.Repo.Owner,
 		Repo:       p.Repo.Name,
 		Tag:        strings.TrimPrefix(p.Commit.Ref, "refs/tags/"),
