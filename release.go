@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
@@ -11,6 +12,7 @@ import (
 // Release holds ties the drone env data and github client together.
 type releaseClient struct {
 	*github.Client
+	context.Context
 	Owner      string
 	Repo       string
 	Tag        string
@@ -40,7 +42,7 @@ func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
 }
 
 func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
-	release, _, err := rc.Client.Repositories.GetReleaseByTag(rc.Owner, rc.Repo, rc.Tag)
+	release, _, err := rc.Client.Repositories.GetReleaseByTag(rc.Context, rc.Owner, rc.Repo, rc.Tag)
 
 	if err != nil {
 		return nil, fmt.Errorf("Release %s not found", rc.Tag)
@@ -57,7 +59,7 @@ func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 		Prerelease: &rc.Prerelease,
 	}
 
-	release, _, err := rc.Client.Repositories.CreateRelease(rc.Owner, rc.Repo, rr)
+	release, _, err := rc.Client.Repositories.CreateRelease(rc.Context, rc.Owner, rc.Repo, rr)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create release: %s", err)
@@ -67,8 +69,8 @@ func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 	return release, nil
 }
 
-func (rc *releaseClient) uploadFiles(id int, files []string) error {
-	assets, _, err := rc.Client.Repositories.ListReleaseAssets(rc.Owner, rc.Repo, id, &github.ListOptions{})
+func (rc *releaseClient) uploadFiles(id int64, files []string) error {
+	assets, _, err := rc.Client.Repositories.ListReleaseAssets(rc.Context, rc.Owner, rc.Repo, id, &github.ListOptions{})
 
 	if err != nil {
 		return fmt.Errorf("Failed to fetch existing assets: %s", err)
@@ -106,7 +108,7 @@ files:
 
 		for _, asset := range assets {
 			if *asset.Name == path.Base(file) {
-				if _, err := rc.Client.Repositories.DeleteReleaseAsset(rc.Owner, rc.Repo, *asset.ID); err != nil {
+				if _, err := rc.Client.Repositories.DeleteReleaseAsset(rc.Context, rc.Owner, rc.Repo, *asset.ID); err != nil {
 					return fmt.Errorf("Failed to delete %s artifact: %s", file, err)
 				}
 
@@ -116,7 +118,7 @@ files:
 
 		uo := &github.UploadOptions{Name: path.Base(file)}
 
-		if _, _, err = rc.Client.Repositories.UploadReleaseAsset(rc.Owner, rc.Repo, id, uo, handle); err != nil {
+		if _, _, err = rc.Client.Repositories.UploadReleaseAsset(rc.Context, rc.Owner, rc.Repo, id, uo, handle); err != nil {
 			return fmt.Errorf("Failed to upload %s artifact: %s", file, err)
 		}
 
