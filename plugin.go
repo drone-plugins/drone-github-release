@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/url"
 	"path/filepath"
 	"strings"
@@ -71,6 +72,7 @@ func (p Plugin) Exec() error {
 		p.Config.UploadURL = p.Config.UploadURL + "/"
 	}
 
+	var err error
 	if p.Config.Note != "" {
 		if p.Config.Note, err = readStringOrFile(p.Config.Note); err != nil {
 			return fmt.Errorf("error while reading %s: %v", p.Config.Note, err)
