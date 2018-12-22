@@ -61,7 +61,18 @@ func main() {
 			Usage:  "upload url, needs to be changed for ghe",
 			EnvVar: "PLUGIN_UPLOAD_URL,GITHUB_RELEASE_UPLOAD_URL",
 		},
-
+		cli.StringFlag{
+			Name:   "note",
+			Value:  "",
+			Usage:  "file or string with notes for the release (example: changelog)",
+			EnvVar: "PLUGIN_NOTE,GITEA_RELEASE_NOTE",
+		},
+		cli.StringFlag{
+			Name:   "title",
+			Value:  "",
+			Usage:  "file or string for the title shown in the gitea release",
+			EnvVar: "PLUGIN_TITLE,GITEA_RELEASE_TITLE",
+		},
 		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
