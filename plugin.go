@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -34,6 +36,8 @@ type (
 		Prerelease bool
 		BaseURL    string
 		UploadURL  string
+		Title      string
+		Note       string
 	}
 
 	Plugin struct {
@@ -67,6 +71,19 @@ func (p Plugin) Exec() error {
 
 	if !strings.HasSuffix(p.Config.UploadURL, "/") {
 		p.Config.UploadURL = p.Config.UploadURL + "/"
+	}
+
+	var err error
+	if p.Config.Note != "" {
+		if p.Config.Note, err = readStringOrFile(p.Config.Note); err != nil {
+			return fmt.Errorf("error while reading %s: %v", p.Config.Note, err)
+		}
+	}
+
+	if p.Config.Title != "" {
+		if p.Config.Title, err = readStringOrFile(p.Config.Title); err != nil {
+			return fmt.Errorf("error while reading %s: %v", p.Config.Note, err)
+		}
 	}
 
 	for _, glob := range p.Config.Files {
@@ -123,6 +140,8 @@ func (p Plugin) Exec() error {
 		Draft:      p.Config.Draft,
 		Prerelease: p.Config.Prerelease,
 		FileExists: p.Config.FileExists,
+		Title:      p.Config.Title,
+		Note:       p.Config.Note,
 	}
 
 	release, err := rc.buildRelease()
@@ -136,4 +155,19 @@ func (p Plugin) Exec() error {
 	}
 
 	return nil
+}
+
+func readStringOrFile(input string) (string, error) {
+	// Check if input is a file path
+	if _, err := os.Stat(input); err != nil && os.IsNotExist(err) {
+		// No file found => use input as result
+		return input, nil
+	} else if err != nil {
+		return "", err
+	}
+	result, err := ioutil.ReadFile(input)
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
 }

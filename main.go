@@ -61,7 +61,18 @@ func main() {
 			Usage:  "upload url, needs to be changed for ghe",
 			EnvVar: "PLUGIN_UPLOAD_URL,GITHUB_RELEASE_UPLOAD_URL",
 		},
-
+		cli.StringFlag{
+			Name:   "note",
+			Value:  "",
+			Usage:  "file or string with notes for the release (example: changelog)",
+			EnvVar: "PLUGIN_NOTE,GITHUB_RELEASE_NOTE",
+		},
+		cli.StringFlag{
+			Name:   "title",
+			Value:  "",
+			Usage:  "file or string for the title shown in the github release",
+			EnvVar: "PLUGIN_TITLE,GITHUB_RELEASE_TITLE",
+		},
 		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
@@ -120,6 +131,8 @@ func run(c *cli.Context) error {
 			Prerelease: c.Bool("prerelease"),
 			BaseURL:    c.String("base-url"),
 			UploadURL:  c.String("upload-url"),
+			Title:      c.String("title"),
+			Note:       c.String("note"),
 		},
 	}
 
