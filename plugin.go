@@ -28,16 +28,18 @@ type (
 	}
 
 	Config struct {
-		APIKey     string
-		Files      []string
-		FileExists string
-		Checksum   []string
-		Draft      bool
-		Prerelease bool
-		BaseURL    string
-		UploadURL  string
-		Title      string
-		Note       string
+		APIKey          string
+		Files           []string
+		FileExists      string
+		Checksum        []string
+		ChecksumFile    string
+		ChecksumFlatten bool
+		Draft           bool
+		Prerelease      bool
+		BaseURL         string
+		UploadURL       string
+		Title           string
+		Note            string
 	}
 
 	Plugin struct {
@@ -103,7 +105,7 @@ func (p Plugin) Exec() error {
 			err error
 		)
 
-		files, err = writeChecksums(files, p.Config.Checksum)
+		files, err = writeChecksums(files, p.Config.Checksum, p.Config.ChecksumFile, p.Config.ChecksumFlatten)
 
 		if err != nil {
 			return fmt.Errorf("Failed to write checksums. %s", err)
