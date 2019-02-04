@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -58,7 +59,7 @@ func checksum(r io.Reader, method string) (string, error) {
 	return "", fmt.Errorf("Hashing method %s is not supported", method)
 }
 
-func writeChecksums(files, methods []string) ([]string, error) {
+func writeChecksums(files, methods []string, format string, flatten bool) ([]string, error) {
 	checksums := make(map[string][]string)
 
 	for _, method := range methods {
@@ -80,7 +81,7 @@ func writeChecksums(files, methods []string) ([]string, error) {
 	}
 
 	for method, results := range checksums {
-		filename := method + "sum.txt"
+		filename := strings.Replace(format, "CHECKSUM", method, -1)
 		f, err := os.Create(filename)
 
 		if err != nil {
@@ -90,6 +91,10 @@ func writeChecksums(files, methods []string) ([]string, error) {
 		for i := 0; i < len(results); i += 2 {
 			hash := results[i]
 			file := results[i+1]
+
+			if flatten {
+				file = filepath.Base(file)
+			}
 
 			if _, err := f.WriteString(fmt.Sprintf("%s  %s\n", hash, file)); err != nil {
 				return nil, err
