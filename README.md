@@ -12,26 +12,31 @@ Drone plugin to publish files and artifacts to GitHub Release. For the usage inf
 
 ## Build
 
-Build the binary with the following commands:
+Build the binary with the following command:
 
-```
-go build
+```console
+export GOOS=linux
+export GOARCH=amd64
+export CGO_ENABLED=0
+export GO111MODULE=on
+
+go build -v -a -tags netgo -o release/linux/amd64/drone-github-release
 ```
 
 ## Docker
 
-Build the Docker image with the following commands:
+Build the Docker image with the following command:
 
-```
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -tags netgo -o release/linux/amd64/drone-github-release
-docker build --rm -t plugins/github-release .
+```console
+docker build \
+  --label org.label-schema.build-date=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --label org.label-schema.vcs-ref=$(git rev-parse --short HEAD) \
+  --file docker/Dockerfile.linux.amd64 --tag plugins/github-release .
 ```
 
 ## Usage
 
-Execute from the working directory:
-
-```sh
+```console
 docker run --rm \
   -e DRONE_BUILD_EVENT=tag \
   -e DRONE_REPO_OWNER=octocat \
