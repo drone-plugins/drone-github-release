@@ -29,12 +29,12 @@ func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
 
 	if err != nil && release == nil {
 		fmt.Println(err)
+		// if no release was found by that tag, create a new one
+		release, err = rc.newRelease()
 	} else if release != nil {
-		return release, nil
+		// update release if exists
+		release, err = rc.editRelease(*release.ID)
 	}
-
-	// if no release was found by that tag, create a new one
-	release, err = rc.newRelease()
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to retrieve or create a release: %s", err)
@@ -51,6 +51,25 @@ func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
 	}
 
 	fmt.Printf("Successfully retrieved %s release\n", rc.Tag)
+	return release, nil
+}
+
+func (rc *releaseClient) editRelease(rid int64) (*github.RepositoryRelease, error) {
+	rr := &github.RepositoryRelease{
+		TagName:    github.String(rc.Tag),
+		Draft:      &rc.Draft,
+		Prerelease: &rc.Prerelease,
+		Name:       &rc.Title,
+		Body:       &rc.Note,
+	}
+
+	release, _, err := rc.Client.Repositories.EditRelease(rc.Context, rc.Owner, rc.Repo, rid, rr)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to update release: %s", err)
+	}
+
+	fmt.Printf("Successfully updated %s release\n", rc.Tag)
 	return release, nil
 }
 
