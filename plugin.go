@@ -40,7 +40,7 @@ type (
 		UploadURL       string
 		Title           string
 		Note            string
-		Overwrite		bool
+		Overwrite       bool
 	}
 
 	Plugin struct {
