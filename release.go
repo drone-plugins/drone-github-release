@@ -21,6 +21,7 @@ type releaseClient struct {
 	FileExists string
 	Title      string
 	Note       string
+	Overwrite  bool
 }
 
 func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
@@ -31,7 +32,7 @@ func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
 		fmt.Println(err)
 		// if no release was found by that tag, create a new one
 		release, err = rc.newRelease()
-	} else if release != nil {
+	} else if release != nil && rc.Overwrite == true {
 		// update release if exists
 		release, err = rc.editRelease(*release.ID)
 	}
@@ -56,9 +57,6 @@ func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
 
 func (rc *releaseClient) editRelease(rid int64) (*github.RepositoryRelease, error) {
 	rr := &github.RepositoryRelease{
-		TagName:    github.String(rc.Tag),
-		Draft:      &rc.Draft,
-		Prerelease: &rc.Prerelease,
 		Name:       &rc.Title,
 		Body:       &rc.Note,
 	}

@@ -40,6 +40,7 @@ type (
 		UploadURL       string
 		Title           string
 		Note            string
+		Overwrite		bool
 	}
 
 	Plugin struct {
@@ -144,6 +145,7 @@ func (p Plugin) Exec() error {
 		FileExists: p.Config.FileExists,
 		Title:      p.Config.Title,
 		Note:       p.Config.Note,
+		Overwrite:  p.Config.Overwrite,
 	}
 
 	release, err := rc.buildRelease()

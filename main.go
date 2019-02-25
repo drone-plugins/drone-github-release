@@ -84,6 +84,11 @@ func main() {
 			Usage:  "file or string for the title shown in the github release",
 			EnvVar: "PLUGIN_TITLE,GITHUB_RELEASE_TITLE",
 		},
+		cli.BoolFlag{
+			Name:   "overwrite",
+			Usage:  "force overwrite existing release informations e.g. title or note",
+			EnvVar: "PLUGIN_OVERWRITE,GITHUB_RELEASE_OVERWRIDE",
+		},
 		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
@@ -146,6 +151,7 @@ func run(c *cli.Context) error {
 			UploadURL:       c.String("upload-url"),
 			Title:           c.String("title"),
 			Note:            c.String("note"),
+			Overwrite:       c.Bool("overwrite"),
 		},
 	}
 
