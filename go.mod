@@ -1,13 +1,9 @@
 module github.com/drone-plugins/drone-github-release
 
 require (
-	github.com/google/go-github v17.0.0+incompatible
-	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/go-github/v28 v28.0.0
 	github.com/joho/godotenv v1.3.0
-	github.com/sirupsen/logrus v1.3.0
-	github.com/urfave/cli v1.20.0
-	golang.org/x/net v0.0.0-20190108225652-1e06a53dbb7e // indirect
-	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890
-	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
-	google.golang.org/appengine v1.4.0 // indirect
+	github.com/sirupsen/logrus v1.4.2
+	github.com/urfave/cli v1.21.0
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 )
