@@ -162,6 +162,9 @@ func (p Plugin) Exec() error {
 }
 
 func readStringOrFile(input string) (string, error) {
+	if len(input) > 255 {
+		return input, nil
+	}
 	// Check if input is a file path
 	if _, err := os.Stat(input); err != nil && os.IsNotExist(err) {
 		// No file found => use input as result
