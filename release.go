@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v28/github"
 )
 
 // Release holds ties the drone env data and github client together.
@@ -57,8 +57,8 @@ func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
 
 func (rc *releaseClient) editRelease(rid int64) (*github.RepositoryRelease, error) {
 	rr := &github.RepositoryRelease{
-		Name:       &rc.Title,
-		Body:       &rc.Note,
+		Name: &rc.Title,
+		Body: &rc.Note,
 	}
 
 	release, _, err := rc.Client.Repositories.EditRelease(rc.Context, rc.Owner, rc.Repo, rid, rr)
