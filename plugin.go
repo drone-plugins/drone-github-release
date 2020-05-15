@@ -101,6 +101,10 @@ func (p Plugin) Exec() error {
 		}
 	}
 
+	if len(p.Config.Files) > 0 && len(files) < 1 {
+		return fmt.Errorf("Failed to find any file to release")
+	}
+
 	if len(p.Config.Checksum) > 0 {
 		var (
 			err error
