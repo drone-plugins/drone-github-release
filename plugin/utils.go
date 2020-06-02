@@ -69,7 +69,7 @@ func checksum(r io.Reader, method string) (string, error) {
 		return strconv.FormatUint(uint64(crc32.ChecksumIEEE(b)), 10), nil
 	}
 
-	return "", fmt.Errorf("Hashing method %s is not supported", method)
+	return "", fmt.Errorf("hashing method %s is not supported", method)
 }
 
 func writeChecksums(files, methods []string, format string, flatten bool) ([]string, error) {
@@ -80,7 +80,7 @@ func writeChecksums(files, methods []string, format string, flatten bool) ([]str
 			handle, err := os.Open(file)
 
 			if err != nil {
-				return nil, fmt.Errorf("Failed to read %s artifact: %s", file, err)
+				return nil, fmt.Errorf("failed to read %s artifact: %w", file, err)
 			}
 
 			hash, err := checksum(handle, method)
