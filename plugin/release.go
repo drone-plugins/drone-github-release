@@ -37,7 +37,7 @@ func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
 		fmt.Println(err)
 		// if no release was found by that tag, create a new one
 		release, err = rc.newRelease()
-	} else if release != nil && rc.Overwrite == true {
+	} else if release != nil && rc.Overwrite {
 		// update release if exists
 		release, err = rc.editRelease(*release.ID)
 	}
