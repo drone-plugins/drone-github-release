@@ -1,11 +1,16 @@
-package main // Needs to be same package to be able to access the private func "readStringOrFile"
+// Copyright (c) 2020, the Drone Plugins project authors.
+// Please see the AUTHORS file for details. All rights reserved.
+// Use of this source code is governed by an Apache 2.0 license that can be
+// found in the LICENSE file.
+
+package plugin
 
 import (
 	"testing"
 )
 
 func TestReadStringOrFileSelf(t *testing.T) {
-	contents, err := readStringOrFile("./plugin_test.go")
+	contents, err := readStringOrFile("./plugin/plugin_test.go")
 
 	if err != nil {
 		t.Error(err)
