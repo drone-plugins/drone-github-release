@@ -1,4 +1,4 @@
-FROM plugins/base:multiarch
+FROM plugins/base:mulitarch
 
 LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
   org.label-schema.name="Drone GitHub Release" \
@@ -6,4 +6,4 @@ LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
   org.label-schema.schema-version="1.0"
 
 ADD release/linux/amd64/drone-github-release /bin/
-ENTRYPOINT ["/bin/drone-github-release"]
+ENTRYPOINT [ "/bin/drone-github-release" ]
