@@ -12,22 +12,27 @@ import (
 
 	"github.com/drone-plugins/drone-plugin-lib/errors"
 	"github.com/drone-plugins/drone-plugin-lib/urfave"
+	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
-
 	"github.com/drone-plugins/drone-github-release/plugin"
 )
 
 var version = "unknown"
 
 func main() {
-	app := cli.NewApp()
-	app.Name = "drone-github-release"
-	app.Usage = "creates a github release"
-	app.Version = version
+	settings := &plugin.Settings{}
 
-	settings := plugin.Settings{}
-	app.Flags = append(settingsFlags(&settings), urfave.Flags()...)
-	app.Action = run(&settings)
+	if _, err := os.Stat("/run/drone/env"); err == nil {
+		godotenv.Overload("/run/drone/env")
+	}
+
+	app := &cli.App{
+		Name:    "drone-github-release",
+		Usage:   "creates a github release",
+		Version: version,
+		Flags:   append(settingsFlags(settings), urfave.Flags()...),
+		Action:  run(settings),
+	}
 
 	if err := app.Run(os.Args); err != nil {
 		errors.HandleExit(err)
