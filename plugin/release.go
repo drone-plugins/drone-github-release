@@ -85,6 +85,18 @@ func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 		Body:       &rc.Note,
 	}
 
+	if *rr.Prerelease {
+		fmt.Printf("Release %s identified as a pre-release\n", rc.Tag)
+	} else {
+		fmt.Printf("Release %s identified as a full release\n", rc.Tag)
+	}
+
+	if *rr.Draft {
+		fmt.Printf("Release %s will be created as draft (unpublished) release\n", rc.Tag)
+	} else {
+		fmt.Printf("Release %s will be created and published\n", rc.Tag)
+	}
+
 	release, _, err := rc.Client.Repositories.CreateRelease(rc.Context, rc.Owner, rc.Repo, rr)
 
 	if err != nil {
