@@ -32,6 +32,7 @@ type Settings struct {
 	Title           string
 	Note            string
 	Overwrite       bool
+	PickupDraft     bool
 
 	baseURL   *url.URL
 	uploadURL *url.URL
@@ -125,17 +126,18 @@ func (p *Plugin) Execute() error {
 	client.UploadURL = p.settings.uploadURL
 
 	rc := releaseClient{
-		Client:     client,
-		Context:    p.network.Context,
-		Owner:      p.pipeline.Repo.Owner,
-		Repo:       p.pipeline.Repo.Name,
-		Tag:        strings.TrimPrefix(p.pipeline.Commit.Ref, "refs/tags/"),
-		Draft:      p.settings.Draft,
-		Prerelease: p.settings.Prerelease,
-		FileExists: p.settings.FileExists,
-		Title:      p.settings.Title,
-		Note:       p.settings.Note,
-		Overwrite:  p.settings.Overwrite,
+		Client:      client,
+		Context:     p.network.Context,
+		Owner:       p.pipeline.Repo.Owner,
+		Repo:        p.pipeline.Repo.Name,
+		Tag:         strings.TrimPrefix(p.pipeline.Commit.Ref, "refs/tags/"),
+		Draft:       p.settings.Draft,
+		Prerelease:  p.settings.Prerelease,
+		FileExists:  p.settings.FileExists,
+		Title:       p.settings.Title,
+		Note:        p.settings.Note,
+		Overwrite:   p.settings.Overwrite,
+		PickupDraft: p.settings.PickupDraft,
 	}
 
 	release, err := rc.buildRelease()

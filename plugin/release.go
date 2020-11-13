@@ -18,20 +18,34 @@ import (
 type releaseClient struct {
 	*github.Client
 	context.Context
-	Owner      string
-	Repo       string
-	Tag        string
-	Draft      bool
-	Prerelease bool
-	FileExists string
-	Title      string
-	Note       string
-	Overwrite  bool
+	Owner       string
+	Repo        string
+	Tag         string
+	Draft       bool
+	Prerelease  bool
+	FileExists  string
+	Title       string
+	Note        string
+	Overwrite   bool
+	PickupDraft bool
 }
 
 func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
-	// first attempt to get a release by that tag
-	release, err := rc.getRelease()
+
+	var release *github.RepositoryRelease
+	var err error
+
+	if rc.PickupDraft {
+		release, err = rc.getReleaseDraft()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if release == nil {
+		// first attempt to get a release by that tag
+		release, err = rc.getRelease()
+	}
 
 	if err != nil && release == nil {
 		fmt.Println(err)
@@ -39,7 +53,7 @@ func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
 		release, err = rc.newRelease()
 	} else if release != nil && rc.Overwrite {
 		// update release if exists
-		release, err = rc.editRelease(*release.ID)
+		release, err = rc.editRelease(*release)
 	}
 
 	if err != nil {
@@ -47,6 +61,30 @@ func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
 	}
 
 	return release, nil
+}
+
+func (rc *releaseClient) getReleaseDraft() (*github.RepositoryRelease, error) {
+	releaseList, _, err := rc.Client.Repositories.ListReleases(rc.Context, rc.Owner, rc.Repo, &github.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list releases: %w", err)
+	}
+
+	dID := int64(-1)
+	for _, rel := range releaseList {
+		if rel.GetDraft() && rel.GetTagName() == rc.Tag {
+			dID = rel.GetID()
+			break
+		}
+	}
+	if dID != -1 {
+		releaseDraft, _, err := rc.Client.Repositories.GetRelease(rc.Context, rc.Owner, rc.Repo, dID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get release for ID %d: %w", dID, err)
+		}
+		return releaseDraft, nil
+	}
+	fmt.Println("No release draft found")
+	return nil, nil
 }
 
 func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
@@ -60,20 +98,30 @@ func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
 	return release, nil
 }
 
-func (rc *releaseClient) editRelease(rid int64) (*github.RepositoryRelease, error) {
-	rr := &github.RepositoryRelease{
+func (rc *releaseClient) editRelease(targetRelease github.RepositoryRelease) (*github.RepositoryRelease, error) {
+
+	sourceRelease := &github.RepositoryRelease{
 		Name: &rc.Title,
 		Body: &rc.Note,
 	}
 
-	release, _, err := rc.Client.Repositories.EditRelease(rc.Context, rc.Owner, rc.Repo, rid, rr)
+	// only potentially change the draft value, if it's a draft right now
+	// i.e. a drafted release will be published, but a release won't be unpublished
+	if targetRelease.GetDraft() {
+		if !rc.Draft {
+			fmt.Println("Publishing a release draft")
+		}
+		sourceRelease.Draft = &rc.Draft
+	}
+
+	modifiedRelease, _, err := rc.Client.Repositories.EditRelease(rc.Context, rc.Owner, rc.Repo, targetRelease.GetID(), sourceRelease)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to update release: %w", err)
 	}
 
 	fmt.Printf("Successfully updated %s release\n", rc.Tag)
-	return release, nil
+	return modifiedRelease, nil
 }
 
 func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {

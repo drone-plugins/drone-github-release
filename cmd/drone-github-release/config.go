@@ -95,5 +95,11 @@ func settingsFlags(settings *plugin.Settings) []cli.Flag {
 			EnvVars:     []string{"PLUGIN_OVERWRITE", "GITHUB_RELEASE_OVERWRIDE"},
 			Destination: &settings.Overwrite,
 		},
+		&cli.BoolFlag{
+			Name:        "pickup-draft",
+			Usage:       "pick up an existing release draft if there is any",
+			EnvVars:     []string{"PLUGIN_PICKUP_DRAFT", "GITHUB_PICKUP_DRAFT"},
+			Destination: &settings.PickupDraft,
+		},
 	}
 }
