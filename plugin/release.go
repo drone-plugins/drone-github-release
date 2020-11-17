@@ -18,34 +18,20 @@ import (
 type releaseClient struct {
 	*github.Client
 	context.Context
-	Owner       string
-	Repo        string
-	Tag         string
-	Draft       bool
-	Prerelease  bool
-	FileExists  string
-	Title       string
-	Note        string
-	Overwrite   bool
-	PickupDraft bool
+	Owner      string
+	Repo       string
+	Tag        string
+	Draft      bool
+	Prerelease bool
+	FileExists string
+	Title      string
+	Note       string
+	Overwrite  bool
 }
 
 func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
-
-	var release *github.RepositoryRelease
-	var err error
-
-	if rc.PickupDraft {
-		release, err = rc.getReleaseDraft()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if release == nil {
-		// first attempt to get a release by that tag
-		release, err = rc.getRelease()
-	}
+	// first attempt to get a release by that tag
+	release, err := rc.getRelease()
 
 	if err != nil && release == nil {
 		fmt.Println(err)
@@ -63,39 +49,36 @@ func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
 	return release, nil
 }
 
-func (rc *releaseClient) getReleaseDraft() (*github.RepositoryRelease, error) {
-	releaseList, _, err := rc.Client.Repositories.ListReleases(rc.Context, rc.Owner, rc.Repo, &github.ListOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to list releases: %w", err)
-	}
-
-	dID := int64(-1)
-	for _, rel := range releaseList {
-		if rel.GetDraft() && rel.GetTagName() == rc.Tag {
-			dID = rel.GetID()
-			break
-		}
-	}
-	if dID != -1 {
-		releaseDraft, _, err := rc.Client.Repositories.GetRelease(rc.Context, rc.Owner, rc.Repo, dID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get release for ID %d: %w", dID, err)
-		}
-		return releaseDraft, nil
-	}
-	fmt.Println("No release draft found")
-	return nil, nil
-}
-
 func (rc *releaseClient) getRelease() (*github.RepositoryRelease, error) {
-	release, _, err := rc.Client.Repositories.GetReleaseByTag(rc.Context, rc.Owner, rc.Repo, rc.Tag)
 
-	if err != nil {
-		return nil, fmt.Errorf("release %s not found", rc.Tag)
+	listOpts := &github.ListOptions{PerPage: 10}
+
+	for {
+		// get list of releases (10 releases per page)
+		releases, resp, err := rc.Client.Repositories.ListReleases(rc.Context, rc.Owner, rc.Repo, listOpts)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list releases: %w", err)
+		}
+
+		// browse through current release page
+		for _, release := range releases {
+
+			// return release associated to the given tag (can only be one)
+			if release.GetTagName() == rc.Tag {
+				fmt.Printf("Found release %d for tag %s\n", release.GetID(), release.GetTagName())
+				return release, nil
+			}
+		}
+
+		// end of list found without finding a matching release
+		if resp.NextPage == 0 {
+			fmt.Println("no existing release (draft) found for the given tag")
+			return nil, nil
+		}
+
+		// go to next page in the next iteration
+		listOpts.Page = resp.NextPage
 	}
-
-	fmt.Printf("Successfully retrieved %s release\n", rc.Tag)
-	return release, nil
 }
 
 func (rc *releaseClient) editRelease(targetRelease github.RepositoryRelease) (*github.RepositoryRelease, error) {
