@@ -48,3 +48,4 @@ docker run --rm \
   -w $(pwd) \
   plugins/github-release
 ```
+
