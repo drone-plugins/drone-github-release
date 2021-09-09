@@ -5,7 +5,10 @@ go 1.15
 require (
 	github.com/drone-plugins/drone-plugin-lib v0.4.0
 	github.com/google/go-github/v38 v38.1.0
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/urfave/cli/v2 v2.3.0
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5
+	google.golang.org/appengine v1.6.7 // indirect
 )
