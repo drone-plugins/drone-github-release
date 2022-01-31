@@ -136,9 +136,7 @@ func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 	}
 
 	if *rr.GenerateReleaseNotes {
-		fmt.Printf("Release %s automatically will generate release notes\n", rc.Tag)
-	} else {
-		fmt.Printf("Release %s automatically will not generate release notes\n", rc.Tag)
+		fmt.Printf("Release notes for %s will be automatically generated\n", rc.Tag)
 	}
 
 	release, _, err := rc.Client.Repositories.CreateRelease(rc.Context, rc.Owner, rc.Repo, rr)
