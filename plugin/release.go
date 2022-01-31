@@ -11,22 +11,23 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/go-github/v38/github"
+	"github.com/google/go-github/v41/github"
 )
 
 // Release holds ties the drone env data and github client together.
 type releaseClient struct {
 	*github.Client
 	context.Context
-	Owner      string
-	Repo       string
-	Tag        string
-	Draft      bool
-	Prerelease bool
-	FileExists string
-	Title      string
-	Note       string
-	Overwrite  bool
+	Owner                string
+	Repo                 string
+	Tag                  string
+	Draft                bool
+	Prerelease           bool
+	FileExists           string
+	Title                string
+	Note                 string
+	Overwrite            bool
+	GenerateReleaseNotes bool
 }
 
 func (rc *releaseClient) buildRelease() (*github.RepositoryRelease, error) {
@@ -114,11 +115,12 @@ func (rc *releaseClient) editRelease(targetRelease github.RepositoryRelease) (*g
 
 func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 	rr := &github.RepositoryRelease{
-		TagName:    github.String(rc.Tag),
-		Draft:      &rc.Draft,
-		Prerelease: &rc.Prerelease,
-		Name:       &rc.Title,
-		Body:       &rc.Note,
+		TagName:              github.String(rc.Tag),
+		Draft:                &rc.Draft,
+		Prerelease:           &rc.Prerelease,
+		Name:                 &rc.Title,
+		Body:                 &rc.Note,
+		GenerateReleaseNotes: &rc.GenerateReleaseNotes,
 	}
 
 	if *rr.Prerelease {
@@ -131,6 +133,10 @@ func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 		fmt.Printf("Release %s will be created as draft (unpublished) release\n", rc.Tag)
 	} else {
 		fmt.Printf("Release %s will be created and published\n", rc.Tag)
+	}
+
+	if *rr.GenerateReleaseNotes {
+		fmt.Printf("Release notes for %s will be automatically generated\n", rc.Tag)
 	}
 
 	release, _, err := rc.Client.Repositories.CreateRelease(rc.Context, rc.Owner, rc.Repo, rr)
