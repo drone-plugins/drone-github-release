@@ -151,7 +151,7 @@ func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 
 func (rc *releaseClient) uploadFiles(id int64, files []string) error {
 	var assets []*github.ReleaseAsset
-	var listOpts *github.ListOptions
+	listOpts := &github.ListOptions{PerPage: 10}
 	for {
 		a, resp, err := rc.Client.Repositories.ListReleaseAssets(rc.Context, rc.Owner, rc.Repo, id, listOpts)
 		if err != nil {
@@ -164,10 +164,6 @@ func (rc *releaseClient) uploadFiles(id int64, files []string) error {
 			break
 		}
 
-		// go to next page in the next iteration
-		if listOpts == nil {
-			listOpts = &github.ListOptions{}
-		}
 		listOpts.Page = resp.NextPage
 	}
 
