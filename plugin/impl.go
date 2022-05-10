@@ -19,6 +19,7 @@ import (
 
 // Settings for the plugin.
 type Settings struct {
+	GitHubURL            string
 	APIKey               string
 	Files                cli.StringSlice
 	FileExists           string
@@ -55,20 +56,29 @@ func (p *Plugin) Validate() error {
 		return fmt.Errorf("invalid value for file_exists")
 	}
 
-	if !strings.HasSuffix(p.settings.BaseURL, "/") {
-		p.settings.BaseURL = p.settings.BaseURL + "/"
-	}
-	p.settings.baseURL, err = url.Parse(p.settings.BaseURL)
-	if err != nil {
-		return fmt.Errorf("failed to parse base url: %w", err)
-	}
+	if p.settings.BaseURL != "" && p.settings.UploadURL != "" {
+		fmt.Printf("Both base_url and upload_url are deprecated. Please remove them from your config!")
 
-	if !strings.HasSuffix(p.settings.UploadURL, "/") {
-		p.settings.UploadURL = p.settings.UploadURL + "/"
-	}
-	p.settings.uploadURL, err = url.Parse(p.settings.UploadURL)
-	if err != nil {
-		return fmt.Errorf("failed to parse upload url: %w", err)
+		if !strings.HasSuffix(p.settings.BaseURL, "/") {
+			p.settings.BaseURL = p.settings.BaseURL + "/"
+		}
+		p.settings.baseURL, err = url.Parse(p.settings.BaseURL)
+		if err != nil {
+			return fmt.Errorf("failed to parse base url: %w", err)
+		}
+
+		if !strings.HasSuffix(p.settings.UploadURL, "/") {
+			p.settings.UploadURL = p.settings.UploadURL + "/"
+		}
+		p.settings.uploadURL, err = url.Parse(p.settings.UploadURL)
+		if err != nil {
+			return fmt.Errorf("failed to parse upload url: %w", err)
+		}
+	} else {
+		p.settings.baseURL, p.settings.uploadURL, err = gitHubURLs(p.settings.GitHubURL)
+		if err != nil {
+			return fmt.Errorf("failed to get GitHub urls: %w", err)
+		}
 	}
 
 	if p.settings.Note != "" {
@@ -151,4 +161,26 @@ func (p *Plugin) Execute() error {
 	}
 
 	return nil
+}
+
+func gitHubURLs(gh string) (*url.URL, *url.URL, error) {
+	uri, err := url.Parse(gh)
+	if err != nil {
+		return nil, nil, fmt.Errorf("could not parse GitHub link")
+	}
+
+	// Remove the path in the case that DRONE_REPO_LINK was passed in
+	uri.Path = ""
+
+	if uri.Hostname() != "github.com" {
+		relBaseURL, _ := url.Parse("./api/v3/")
+		relUploadURL, _ := url.Parse("./api/v3/upload/")
+
+		return uri.ResolveReference(relBaseURL), uri.ResolveReference(relUploadURL), nil
+	}
+
+	baseURL, _ := url.Parse("https://api.github.com/")
+	uploadURL, _ := url.Parse("https://uploads.github.com/")
+
+	return baseURL, uploadURL, nil
 }

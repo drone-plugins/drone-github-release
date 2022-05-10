@@ -14,6 +14,12 @@ import (
 func settingsFlags(settings *plugin.Settings) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
+			Name:        "github-url",
+			Usage:       "github url, defaults to current scm",
+			EnvVars:     []string{"PLUGIN_GITHUB_URL", "DRONE_REPO_LINK"},
+			Destination: &settings.GitHubURL,
+		},
+		&cli.StringFlag{
 			Name:        "api-key",
 			Usage:       "api key to access github api",
 			EnvVars:     []string{"PLUGIN_API_KEY", "GITHUB_RELEASE_API_KEY", "GITHUB_TOKEN"},
@@ -66,14 +72,12 @@ func settingsFlags(settings *plugin.Settings) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "base-url",
 			Usage:       "api url, needs to be changed for ghe",
-			Value:       "https://api.github.com/",
 			EnvVars:     []string{"PLUGIN_BASE_URL", "GITHUB_RELEASE_BASE_URL"},
 			Destination: &settings.BaseURL,
 		},
 		&cli.StringFlag{
 			Name:        "upload-url",
 			Usage:       "upload url, needs to be changed for ghe",
-			Value:       "https://uploads.github.com/",
 			EnvVars:     []string{"PLUGIN_UPLOAD_URL", "GITHUB_RELEASE_UPLOAD_URL"},
 			Destination: &settings.UploadURL,
 		},
