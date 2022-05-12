@@ -28,7 +28,6 @@ type Settings struct {
 	ChecksumFlatten      bool
 	Draft                bool
 	Prerelease           bool
-	DiscussionCategory   string
 	BaseURL              string
 	UploadURL            string
 	Title                string
@@ -144,7 +143,6 @@ func (p *Plugin) Execute() error {
 		Tag:                  strings.TrimPrefix(p.pipeline.Commit.Ref, "refs/tags/"),
 		Draft:                p.settings.Draft,
 		Prerelease:           p.settings.Prerelease,
-		DiscussionCategory:   p.settings.DiscussionCategory,
 		FileExists:           p.settings.FileExists,
 		Title:                p.settings.Title,
 		Note:                 p.settings.Note,

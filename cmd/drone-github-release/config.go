@@ -70,12 +70,6 @@ func settingsFlags(settings *plugin.Settings) []cli.Flag {
 			Destination: &settings.Prerelease,
 		},
 		&cli.StringFlag{
-			Name:        "discussion-category",
-			Usage:       "create a discussion in the given category",
-			EnvVars:     []string{"PLUGIN_DISCUSSION_CATEGORY", "GITHUB_RELEASE_DISCUSSION_CATEGORY"},
-			Destination: &settings.DiscussionCategory,
-		},
-		&cli.StringFlag{
 			Name:        "base-url",
 			Usage:       "api url, needs to be changed for ghe",
 			EnvVars:     []string{"PLUGIN_BASE_URL", "GITHUB_RELEASE_BASE_URL"},
