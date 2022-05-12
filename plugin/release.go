@@ -24,7 +24,6 @@ type releaseClient struct {
 	Draft                bool
 	Prerelease           bool
 	FileExists           string
-	DiscussionCategory   string
 	Title                string
 	Note                 string
 	Overwrite            bool
@@ -97,17 +96,11 @@ func (rc *releaseClient) editRelease(targetRelease github.RepositoryRelease) (*g
 	// only potentially change the draft value, if it's a draft right now
 	// i.e. a drafted release will be published, but a release won't be unpublished
 	if targetRelease.GetDraft() {
+		fmt.Printf("DRAFT: %+v\n", rc.Draft)
 		if !rc.Draft {
 			fmt.Println("Publishing a release draft")
 		}
 		sourceRelease.Draft = &rc.Draft
-	}
-
-	// do not overwrite the discussion category
-	if targetRelease.GetDiscussionCategoryName() == "" {
-		if rc.DiscussionCategory != "" {
-			sourceRelease.DiscussionCategoryName = &rc.DiscussionCategory
-		}
 	}
 
 	modifiedRelease, _, err := rc.Client.Repositories.EditRelease(rc.Context, rc.Owner, rc.Repo, targetRelease.GetID(), sourceRelease)
@@ -122,13 +115,12 @@ func (rc *releaseClient) editRelease(targetRelease github.RepositoryRelease) (*g
 
 func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 	rr := &github.RepositoryRelease{
-		TagName:                github.String(rc.Tag),
-		Draft:                  &rc.Draft,
-		Prerelease:             &rc.Prerelease,
-		DiscussionCategoryName: &rc.DiscussionCategory,
-		Name:                   &rc.Title,
-		Body:                   &rc.Note,
-		GenerateReleaseNotes:   &rc.GenerateReleaseNotes,
+		TagName:              github.String(rc.Tag),
+		Draft:                &rc.Draft,
+		Prerelease:           &rc.Prerelease,
+		Name:                 &rc.Title,
+		Body:                 &rc.Note,
+		GenerateReleaseNotes: &rc.GenerateReleaseNotes,
 	}
 
 	if *rr.Prerelease {
@@ -145,12 +137,6 @@ func (rc *releaseClient) newRelease() (*github.RepositoryRelease, error) {
 
 	if *rr.GenerateReleaseNotes {
 		fmt.Printf("Release notes for %s will be automatically generated\n", rc.Tag)
-	}
-
-	if *rr.DiscussionCategoryName != "" {
-		fmt.Printf("Release discussion in category %s\n", *rr.DiscussionCategoryName)
-	} else {
-		fmt.Println("Not creating a discussion")
 	}
 
 	release, _, err := rc.Client.Repositories.CreateRelease(rc.Context, rc.Owner, rc.Repo, rr)
