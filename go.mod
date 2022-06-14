@@ -7,5 +7,5 @@ require (
 	github.com/google/go-github/v44 v44.1.0
 	github.com/joho/godotenv v1.4.0
 	github.com/urfave/cli/v2 v2.8.1
-	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb
 )
