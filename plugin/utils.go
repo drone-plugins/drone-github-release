@@ -14,7 +14,6 @@ import (
 	"hash/adler32"
 	"hash/crc32"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -40,7 +39,7 @@ func readStringOrFile(input string) (string, error) {
 	} else if err != nil {
 		return "", err
 	}
-	result, err := ioutil.ReadFile(input)
+	result, err := os.ReadFile(input)
 	if err != nil {
 		return "", err
 	}
@@ -48,7 +47,7 @@ func readStringOrFile(input string) (string, error) {
 }
 
 func checksum(r io.Reader, method string) (string, error) {
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 
 	if err != nil {
 		return "", err

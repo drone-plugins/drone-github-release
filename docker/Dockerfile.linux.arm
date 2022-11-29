@@ -1,9 +1,0 @@
-FROM plugins/base:multiarch@sha256:61f243abf3f1ea407faae94ab4698b51c4cc38b9e734e30ae16e8ec7e6250f6b
-
-LABEL maintainer="Drone.IO Community <drone-dev@googlegroups.com>" \
-  org.label-schema.name="Drone GitHub Release" \
-  org.label-schema.vendor="Drone.IO Community" \
-  org.label-schema.schema-version="1.0"
-
-ADD release/linux/arm/drone-github-release /bin/
-ENTRYPOINT [ "/bin/drone-github-release" ]
