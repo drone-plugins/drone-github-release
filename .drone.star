@@ -4,7 +4,6 @@ def main(ctx):
     stages = [
         linux(ctx, "amd64"),
         linux(ctx, "arm64"),
-        linux(ctx, "arm"),
         windows(ctx, "1909"),
         windows(ctx, "1903"),
         windows(ctx, "1809"),
@@ -37,6 +36,7 @@ def testing(ctx):
                 "image": "golang:1.18",
                 "pull": "always",
                 "commands": [
+                    "go get honnef.co/go/tools/cmd/staticcheck",
                     "go run honnef.co/go/tools/cmd/staticcheck ./...",
                 ],
                 "volumes": [
@@ -50,6 +50,7 @@ def testing(ctx):
                 "name": "lint",
                 "image": "golang:1.18",
                 "commands": [
+                    "go get golang.org/x/lint/golint",
                     "go run golang.org/x/lint/golint -set_exit_status ./...",
                 ],
                 "volumes": [
