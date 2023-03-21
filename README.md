@@ -1,7 +1,10 @@
 # drone-github-release
 
-[![Build Status](http://cloud.drone.io/api/badges/drone-plugins/drone-github-release/status.svg)](http://cloud.drone.io/drone-plugins/drone-github-release)
+
+[![Build Status](http://harness.drone.io/api/badges/drone-plugins/drone-github-release/status.svg)](http://harness.drone.io/drone-plugins/drone-github-release)
+[![Slack](https://img.shields.io/badge/slack-drone-orange.svg?logo=slack)](https://join.slack.com/t/harnesscommunity/shared_invite/zt-y4hdqh7p-RVuEQyIl5Hcx4Ck8VCvzBw)
 [![Join the discussion at https://community.harness.io](https://img.shields.io/badge/discourse-forum-orange.svg)](https://community.harness.io)
+[![Drone questions at https://stackoverflow.com](https://img.shields.io/badge/drone-stackoverflow-orange.svg)](https://stackoverflow.com/questions/tagged/drone.io)
 [![Go Doc](https://godoc.org/github.com/drone-plugins/drone-github-release?status.svg)](http://godoc.org/github.com/drone-plugins/drone-github-release)
 [![Go Report](https://goreportcard.com/badge/github.com/drone-plugins/drone-github-release)](https://goreportcard.com/report/github.com/drone-plugins/drone-github-release)
 
