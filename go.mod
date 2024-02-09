@@ -4,7 +4,8 @@ go 1.20
 
 require (
 	github.com/drone-plugins/drone-plugin-lib v0.4.1
-	github.com/google/go-github/v53 v53.0.0
+	github.com/google/go-github/v53 v53.2.0
+	github.com/google/go-github/v59 v59.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/urfave/cli/v2 v2.25.5
 	golang.org/x/oauth2 v0.8.0
