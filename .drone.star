@@ -33,7 +33,7 @@ def testing(ctx):
         "steps": [
             {
                 "name": "staticcheck",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10",
                 "pull": "always",
                 "commands": [
                     "go get honnef.co/go/tools/cmd/staticcheck",
@@ -48,7 +48,7 @@ def testing(ctx):
             },
             {
                 "name": "lint",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10",
                 "commands": [
                     "go get golang.org/x/lint/golint",
                     "go run golang.org/x/lint/golint -set_exit_status ./...",
@@ -62,7 +62,7 @@ def testing(ctx):
             },
             {
                 "name": "vet",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10",
                 "commands": [
                     "go vet ./...",
                 ],
@@ -75,7 +75,7 @@ def testing(ctx):
             },
             {
                 "name": "test",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10",
                 "commands": [
                     "go test -cover ./...",
                 ],
@@ -115,7 +115,7 @@ def linux(ctx, arch):
     steps = [
         {
             "name": "environment",
-            "image": "golang:1.18",
+            "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10",
             "pull": "always",
             "environment": {
                 "CGO_ENABLED": "0",
@@ -127,7 +127,7 @@ def linux(ctx, arch):
         },
         {
             "name": "build",
-            "image": "golang:1.18",
+            "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10",
             "environment": {
                 "CGO_ENABLED": "0",
             },
@@ -135,7 +135,7 @@ def linux(ctx, arch):
         },
         {
             "name": "executable",
-            "image": "golang:1.18",
+            "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10",
             "commands": [
                 "./release/linux/%s/drone-github-release --help" % (arch),
             ],

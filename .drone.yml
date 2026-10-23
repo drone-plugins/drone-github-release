@@ -9,7 +9,7 @@ pool:
 
 steps:
   - name: lint
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     pull: always
     commands:
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -19,7 +19,7 @@ steps:
       - name: gopath
         path: "/go"
   - name: test
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     commands:
       - go test -cover ./...
     volumes:
@@ -46,7 +46,7 @@ pool:
 
 steps:
   - name: environment
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     pull: always
     environment:
       CGO_ENABLED: "0"
@@ -54,13 +54,13 @@ steps:
       - go version
       - go env
   - name: build
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     environment:
       CGO_ENABLED: "0"
     commands:
       - go build -v -ldflags "-X main.version=" -a -tags netgo -o release/linux/amd64/drone-github-release ./cmd/drone-github-release
   - name: executable
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     commands:
       - ./release/linux/amd64/drone-github-release --help
   - name: docker
@@ -98,7 +98,7 @@ pool:
 
 steps:
   - name: environment
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     pull: always
     environment:
       CGO_ENABLED: "0"
@@ -106,13 +106,13 @@ steps:
       - go version
       - go env
   - name: build
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     environment:
       CGO_ENABLED: "0"
     commands:
       - go build -v -ldflags "-X main.version=" -a -tags netgo -o release/linux/arm64/drone-github-release ./cmd/drone-github-release
   - name: executable
-    image: golang:1.20
+    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10
     commands:
       - ./release/linux/arm64/drone-github-release --help
   - name: docker
@@ -150,7 +150,7 @@ pool:
 
 steps:
   - name: environment
-    image: golang:1.20
+    image: golang:1.26.10
     pull: always
     environment:
       CGO_ENABLED: "0"
@@ -158,13 +158,13 @@ steps:
       - go version
       - go env
   - name: build
-    image: golang:1.20
+    image: golang:1.26.10
     environment:
       CGO_ENABLED: "0"
     commands:
       - go build -v -ldflags "-X main.version=" -a -tags netgo -o release/windows/amd64/drone-github-release.exe ./cmd/drone-github-release
   - name: executable
-    image: golang:1.20
+    image: golang:1.26.10
     commands:
       - ./release/windows/amd64/drone-github-release.exe --help
   - name: docker
@@ -204,7 +204,7 @@ pool:
 
 steps:
   - name: environment
-    image: golang:1.20
+    image: golang:1.26.10
     pull: always
     environment:
       CGO_ENABLED: "0"
@@ -212,13 +212,13 @@ steps:
       - go version
       - go env
   - name: build
-    image: golang:1.20
+    image: golang:1.26.10
     environment:
       CGO_ENABLED: "0"
     commands:
       - go build -v -ldflags "-X main.version=" -a -tags netgo -o release/windows/amd64/drone-github-release.exe ./cmd/drone-github-release
   - name: executable
-    image: golang:1.20
+    image: golang:1.26.10
     commands:
       - ./release/windows/amd64/drone-github-release.exe --help
   - name: docker
