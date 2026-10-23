@@ -240,7 +240,7 @@ def windows(ctx, version):
                 "environment": {
                     "CGO_ENABLED": "0",
                 },
-                "commands": build,
+                "commands": [". ./scripts/setup-go-windows.ps1"] + build,
             },
             {
                 "name": "executable",
