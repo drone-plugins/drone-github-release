@@ -150,22 +150,25 @@ pool:
 
 steps:
   - name: environment
-    image: golang:1.26.10
+    image: golang:1.20
     pull: always
     environment:
       CGO_ENABLED: "0"
     commands:
+      - . ./scripts/setup-go-windows.ps1
       - go version
       - go env
   - name: build
-    image: golang:1.26.10
+    image: golang:1.20
     environment:
       CGO_ENABLED: "0"
     commands:
+      - . ./scripts/setup-go-windows.ps1
       - go build -v -ldflags "-X main.version=" -a -tags netgo -o release/windows/amd64/drone-github-release.exe ./cmd/drone-github-release
   - name: executable
-    image: golang:1.26.10
+    image: golang:1.20
     commands:
+      - . ./scripts/setup-go-windows.ps1
       - ./release/windows/amd64/drone-github-release.exe --help
   - name: docker
     image: plugins/docker
@@ -204,22 +207,25 @@ pool:
 
 steps:
   - name: environment
-    image: golang:1.26.10
+    image: golang:1.20
     pull: always
     environment:
       CGO_ENABLED: "0"
     commands:
+      - . ./scripts/setup-go-windows.ps1
       - go version
       - go env
   - name: build
-    image: golang:1.26.10
+    image: golang:1.20
     environment:
       CGO_ENABLED: "0"
     commands:
+      - . ./scripts/setup-go-windows.ps1
       - go build -v -ldflags "-X main.version=" -a -tags netgo -o release/windows/amd64/drone-github-release.exe ./cmd/drone-github-release
   - name: executable
-    image: golang:1.26.10
+    image: golang:1.20
     commands:
+      - . ./scripts/setup-go-windows.ps1
       - ./release/windows/amd64/drone-github-release.exe --help
   - name: docker
     image: plugins/docker

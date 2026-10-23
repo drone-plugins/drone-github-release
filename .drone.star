@@ -230,6 +230,7 @@ def windows(ctx, version):
                     "CGO_ENABLED": "0",
                 },
                 "commands": [
+                    ". ./scripts/setup-go-windows.ps1",
                     "go version",
                     "go env",
                 ],
