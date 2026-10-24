@@ -260,8 +260,6 @@ pipeline:
                       spec:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: golang:1.20
-                        envVariables:
-                          GOTOOLCHAIN: go1.26.10
                         shell: Powershell
                         command: |-
                           $ErrorActionPreference = "Stop"
@@ -345,8 +343,6 @@ pipeline:
                       spec:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: golang:1.20
-                        envVariables:
-                          GOTOOLCHAIN: go1.26.10
                         shell: Powershell
                         command: |-
                           $ErrorActionPreference = "Stop"

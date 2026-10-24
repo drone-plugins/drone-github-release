@@ -172,7 +172,6 @@ steps:
   - name: executable
     image: golang:1.20
     commands:
-      - . ./scripts/setup-go-windows.ps1
       - ./release/windows/amd64/drone-github-release.exe --help
   - name: docker
     image: plugins/docker
@@ -231,7 +230,6 @@ steps:
   - name: executable
     image: golang:1.20
     commands:
-      - . ./scripts/setup-go-windows.ps1
       - ./release/windows/amd64/drone-github-release.exe --help
   - name: docker
     image: plugins/docker
