@@ -2,6 +2,8 @@ module github.com/drone-plugins/drone-github-release
 
 go 1.20
 
+toolchain go1.26.10
+
 require (
 	github.com/drone-plugins/drone-plugin-lib v0.4.1
 	github.com/google/go-github/v53 v53.0.0

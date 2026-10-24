@@ -33,7 +33,7 @@ def testing(ctx):
         "steps": [
             {
                 "name": "staticcheck",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8",
                 "pull": "always",
                 "commands": [
                     "go get honnef.co/go/tools/cmd/staticcheck",
@@ -48,7 +48,7 @@ def testing(ctx):
             },
             {
                 "name": "lint",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8",
                 "commands": [
                     "go get golang.org/x/lint/golint",
                     "go run golang.org/x/lint/golint -set_exit_status ./...",
@@ -62,7 +62,7 @@ def testing(ctx):
             },
             {
                 "name": "vet",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8",
                 "commands": [
                     "go vet ./...",
                 ],
@@ -75,7 +75,7 @@ def testing(ctx):
             },
             {
                 "name": "test",
-                "image": "golang:1.18",
+                "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8",
                 "commands": [
                     "go test -cover ./...",
                 ],
@@ -115,7 +115,7 @@ def linux(ctx, arch):
     steps = [
         {
             "name": "environment",
-            "image": "golang:1.18",
+            "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8",
             "pull": "always",
             "environment": {
                 "CGO_ENABLED": "0",
@@ -127,7 +127,7 @@ def linux(ctx, arch):
         },
         {
             "name": "build",
-            "image": "golang:1.18",
+            "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8",
             "environment": {
                 "CGO_ENABLED": "0",
             },
@@ -135,7 +135,7 @@ def linux(ctx, arch):
         },
         {
             "name": "executable",
-            "image": "golang:1.18",
+            "image": "harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8",
             "commands": [
                 "./release/linux/%s/drone-github-release --help" % (arch),
             ],
@@ -147,6 +147,8 @@ def linux(ctx, arch):
             "name": "docker",
             "image": "plugins/docker",
             "settings": {
+                'pull_image': True,
+                'no_cache': True,
                 "dockerfile": "docker/Dockerfile.linux.%s" % (arch),
                 "repo": "plugins/github-release",
                 "username": {
@@ -190,7 +192,7 @@ def windows(ctx, version):
         ]
 
         docker = docker + [
-            "docker build --pull -f docker/Dockerfile.windows.%s -t plugins/github-release:%s-windows-%s-amd64 ." % (version, ctx.build.ref.replace("refs/tags/v", ""), version),
+            "docker build --no-cache --pull -f docker/Dockerfile.windows.%s -t plugins/github-release:%s-windows-%s-amd64 ." % (version, ctx.build.ref.replace("refs/tags/v", ""), version),
             "docker run --rm plugins/github-release:%s-windows-%s-amd64 --help" % (ctx.build.ref.replace("refs/tags/v", ""), version),
             "docker push plugins/github-release:%s-windows-%s-amd64" % (ctx.build.ref.replace("refs/tags/v", ""), version),
         ]
@@ -200,7 +202,7 @@ def windows(ctx, version):
         ]
 
         docker = docker + [
-            "docker build --pull -f docker/Dockerfile.windows.%s -t plugins/github-release:windows-%s-amd64 ." % (version, version),
+            "docker build --no-cache --pull -f docker/Dockerfile.windows.%s -t plugins/github-release:windows-%s-amd64 ." % (version, version),
             "docker run --rm plugins/github-release:windows-%s-amd64 --help" % (version),
             "docker push plugins/github-release:windows-%s-amd64" % (version),
         ]
@@ -230,6 +232,7 @@ def windows(ctx, version):
                     "CGO_ENABLED": "0",
                 },
                 "commands": [
+                    ". ./scripts/setup-go-windows.ps1",
                     "go version",
                     "go env",
                 ],
@@ -239,7 +242,7 @@ def windows(ctx, version):
                 "environment": {
                     "CGO_ENABLED": "0",
                 },
-                "commands": build,
+                "commands": [". ./scripts/setup-go-windows.ps1"] + build,
             },
             {
                 "name": "executable",

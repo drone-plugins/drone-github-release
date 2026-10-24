@@ -34,8 +34,8 @@ pipeline:
                   name: Lint
                   identifier: Lint
                   spec:
-                    connectorRef: Plugins_Docker_Hub_Connector
-                    image: golang:1.20
+                    connectorRef: HHI_Public_Images
+                    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8
                     shell: Sh
                     command: |-
                       go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -46,8 +46,8 @@ pipeline:
                   name: Test
                   identifier: Run_1
                   spec:
-                    connectorRef: Plugins_Docker_Hub_Connector
-                    image: golang:1.20
+                    connectorRef: HHI_Public_Images
+                    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8
                     shell: Sh
                     command: go test -cover ./...
               - step:
@@ -55,8 +55,8 @@ pipeline:
                   identifier: Build_test_binaries
                   type: Run
                   spec:
-                    connectorRef: Plugins_Docker_Hub_Connector
-                    image: golang:1.20
+                    connectorRef: HHI_Public_Images
+                    image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8
                     shell: Sh
                     command: |-
                       # force go modules
@@ -96,8 +96,8 @@ pipeline:
                       identifier: Build_binaries
                       type: Run
                       spec:
-                        connectorRef: Plugins_Docker_Hub_Connector
-                        image: golang:1.20
+                        connectorRef: HHI_Public_Images
+                        image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8
                         shell: Sh
                         command: |-
                           # force go modules
@@ -122,6 +122,11 @@ pipeline:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: plugins/docker
                         settings:
+                          pull_image: true
+                          no_cache: true
+                          base_image_registry: harness0.harness.io
+                          base_image_username: <+secrets.getValue("harness0HARUsername")>
+                          base_image_password: <+secrets.getValue("harness0HARPAT")>
                           username: drone
                           password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
                           repo: plugins/github-release
@@ -136,6 +141,12 @@ pipeline:
                       name: BuildAndPushDockerRegistry
                       identifier: BuildAndPushDockerRegistry
                       spec:
+                        envVariables:
+                          PLUGIN_NO_CACHE: "true"
+                          PLUGIN_PULL_IMAGE: "true"
+                          PLUGIN_ENABLE_CACHE: "false"
+                        baseImageConnectorRefs:
+                          - HHI_Public_Images
                         connectorRef: Plugins_Docker_Hub_Connector
                         repo: plugins/github-release
                         tags:
@@ -169,8 +180,8 @@ pipeline:
                       identifier: Build_binaries
                       type: Run
                       spec:
-                        connectorRef: Plugins_Docker_Hub_Connector
-                        image: golang:1.20
+                        connectorRef: HHI_Public_Images
+                        image: harness0.harness.io/oci/docker_artifacts/hhi/go:1.26.10@sha256:718fddf012b3a305e936ae9964e5a642036bcb7b4c6c0786e2f78f238d637db8
                         shell: Sh
                         command: |-
                           # force go modules
@@ -195,6 +206,11 @@ pipeline:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: plugins/docker
                         settings:
+                          pull_image: true
+                          no_cache: true
+                          base_image_registry: harness0.harness.io
+                          base_image_username: <+secrets.getValue("harness0HARUsername")>
+                          base_image_password: <+secrets.getValue("harness0HARPAT")>
                           username: drone
                           password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
                           repo: plugins/github-release
@@ -209,6 +225,12 @@ pipeline:
                       name: BuildAndPushDockerRegistry
                       identifier: BuildAndPushDockerRegistry
                       spec:
+                        envVariables:
+                          PLUGIN_NO_CACHE: "true"
+                          PLUGIN_PULL_IMAGE: "true"
+                          PLUGIN_ENABLE_CACHE: "false"
+                        baseImageConnectorRefs:
+                          - HHI_Public_Images
                         connectorRef: Plugins_Docker_Hub_Connector
                         repo: plugins/github-release
                         tags:
@@ -238,20 +260,15 @@ pipeline:
                       spec:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: golang:1.20
-                        shell: Sh
+                        shell: Powershell
                         command: |-
-                          # force go modules
-                          export GOPATH=""
-
-                          # disable cgo
-                          export CGO_ENABLED=0
-
-                          set -e
-                          set -x
-
-                          # Windows
-                          GOOS=windows
+                          $ErrorActionPreference = "Stop"
+                          . ./scripts/setup-go-windows.ps1
+                          $env:GOPATH = ''
+                          $env:CGO_ENABLED = '0'
+                          $env:GOOS = 'windows'
                           go build -v -ldflags "-X main.version=" -a -tags netgo -o release/windows/amd64/drone-github-release.exe ./cmd/drone-github-release
+                          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
                       when:
                         stageStatus: Success
                   - step:
@@ -262,6 +279,8 @@ pipeline:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: plugins/docker
                         settings:
+                          pull_image: true
+                          no_cache: true
                           username: drone
                           password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
                           repo: plugins/github-release
@@ -276,6 +295,10 @@ pipeline:
                       name: BuildAndPushDockerRegistry
                       identifier: BuildAndPushDockerRegistry
                       spec:
+                        envVariables:
+                          PLUGIN_NO_CACHE: "true"
+                          PLUGIN_PULL_IMAGE: "true"
+                          PLUGIN_ENABLE_CACHE: "false"
                         connectorRef: Plugins_Docker_Hub_Connector
                         repo: plugins/github-release
                         tags:
@@ -320,20 +343,15 @@ pipeline:
                       spec:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: golang:1.20
-                        shell: Sh
+                        shell: Powershell
                         command: |-
-                          # force go modules
-                          export GOPATH=""
-
-                          # disable cgo
-                          export CGO_ENABLED=0
-
-                          set -e
-                          set -x
-
-                          # Windows
-                          GOOS=windows
+                          $ErrorActionPreference = "Stop"
+                          . ./scripts/setup-go-windows.ps1
+                          $env:GOPATH = ''
+                          $env:CGO_ENABLED = '0'
+                          $env:GOOS = 'windows'
                           go build -v -ldflags "-X main.version=" -a -tags netgo -o release/windows/amd64/drone-github-release.exe ./cmd/drone-github-release
+                          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
                   - step:
                       type: Plugin
                       name: BuildAndPushDockerPlugin
@@ -342,6 +360,8 @@ pipeline:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: plugins/docker
                         settings:
+                          pull_image: true
+                          no_cache: true
                           username: drone
                           password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
                           repo: plugins/github-release
@@ -356,6 +376,10 @@ pipeline:
                       name: BuildAndPushDockerRegistry
                       identifier: BuildAndPushDockerRegistry
                       spec:
+                        envVariables:
+                          PLUGIN_NO_CACHE: "true"
+                          PLUGIN_PULL_IMAGE: "true"
+                          PLUGIN_ENABLE_CACHE: "false"
                         connectorRef: Plugins_Docker_Hub_Connector
                         repo: plugins/github-release
                         tags:
