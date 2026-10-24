@@ -122,6 +122,9 @@ pipeline:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: plugins/docker
                         settings:
+                          base_image_registry: harness0.harness.io
+                          base_image_username: <+secrets.getValue("harness0HARUsername")>
+                          base_image_password: <+secrets.getValue("harness0HARPAT")>
                           username: drone
                           password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
                           repo: plugins/github-release
@@ -136,6 +139,8 @@ pipeline:
                       name: BuildAndPushDockerRegistry
                       identifier: BuildAndPushDockerRegistry
                       spec:
+                        baseImageConnectorRefs:
+                          - HHI_Public_Images
                         connectorRef: Plugins_Docker_Hub_Connector
                         repo: plugins/github-release
                         tags:
@@ -195,6 +200,9 @@ pipeline:
                         connectorRef: Plugins_Docker_Hub_Connector
                         image: plugins/docker
                         settings:
+                          base_image_registry: harness0.harness.io
+                          base_image_username: <+secrets.getValue("harness0HARUsername")>
+                          base_image_password: <+secrets.getValue("harness0HARPAT")>
                           username: drone
                           password: <+secrets.getValue("Plugins_Docker_Hub_Pat")>
                           repo: plugins/github-release
@@ -209,6 +217,8 @@ pipeline:
                       name: BuildAndPushDockerRegistry
                       identifier: BuildAndPushDockerRegistry
                       spec:
+                        baseImageConnectorRefs:
+                          - HHI_Public_Images
                         connectorRef: Plugins_Docker_Hub_Connector
                         repo: plugins/github-release
                         tags:
